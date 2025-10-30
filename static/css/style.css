@@ -32,72 +32,6 @@ body {
 
 .container { max-width: 1080px; margin: 0 auto; padding: 20px; }
 
-/* Decorative animated background for the app with subtle overlay */
-.container {
-  position: relative;
-  --c: #1ea7ff;
-  background-color: transparent; /* keep global bg behind */
-  isolation: isolate;
-}
-.container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image:
-    radial-gradient(4px 100px at 0px 235px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 235px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 117.5px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 252px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 252px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 126px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 150px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 150px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 75px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 253px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 253px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 126.5px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 204px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 204px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 102px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 134px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 134px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 67px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 179px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 179px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 89.5px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 299px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 299px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 149.5px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 215px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 215px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 107.5px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 281px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 281px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 140.5px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 158px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 158px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 79px, var(--c) 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 210px, var(--c), #0000),
-    radial-gradient(4px 100px at 300px 210px, var(--c), #0000),
-    radial-gradient(1.5px 1.5px at 150px 105px, var(--c) 100%, #0000 150%);
-  background-size: 300px 235px, 300px 235px, 300px 235px,
-                   300px 252px, 300px 252px, 300px 252px,
-                   300px 150px, 300px 150px, 300px 150px,
-                   300px 253px, 300px 253px, 300px 253px,
-                   300px 204px, 300px 204px, 300px 204px,
-                   300px 134px, 300px 134px, 300px 134px,
-                   300px 179px, 300px 179px, 300px 179px,
-                   300px 299px, 300px 299px, 300px 299px,
-                   300px 215px, 300px 215px, 300px 215px,
-                   300px 281px, 300px 281px, 300px 281px,
-                   300px 158px, 300px 158px, 300px 158px,
-                   300px 210px, 300px 210px, 300px 210px;
-  opacity: .18; /* subtle */
-  animation: hi 120s linear infinite;
-}
-.container > * { position: relative; z-index: 1; }
-
 /* Top nav */
 .nav {
   position: sticky; top: 0; z-index: 20;
@@ -185,13 +119,3 @@ pre { white-space: pre-wrap; word-break: break-word; overflow-wrap:anywhere; mar
 /* Links inside tables */
 td a { color: #93c5fd; text-decoration: none; }
 td a:hover { text-decoration: underline; }
-
-/* Generating spinner styles */
-.gen-spinner[hidden] { display: none !important; }
-.gen-spinner { position:absolute; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,.2); border-radius: 10px; }
-.loader-wrapper { position: relative; display:flex; align-items:center; justify-content:center; width: 180px; height: 180px; font-family: "Inter", ui-sans-serif, system-ui; font-size: 1.2em; font-weight: 300; color: #fff; border-radius: 50%; user-select:none; }
-.loader { position:absolute; top:0; left:0; width:100%; aspect-ratio:1/1; border-radius:50%; background:transparent; animation: loader-rotate 2s linear infinite; z-index:0; }
-@keyframes loader-rotate { 0%{ transform: rotate(90deg); box-shadow: 0 10px 20px 0 #fff inset, 0 20px 30px 0 #ad5fff inset, 0 60px 60px 0 #471eec inset; } 50%{ transform: rotate(270deg); box-shadow: 0 10px 20px 0 #fff inset, 0 20px 10px 0 #d60a47 inset, 0 40px 60px 0 #311e80 inset; } 100%{ transform: rotate(450deg); box-shadow: 0 10px 20px 0 #fff inset, 0 20px 30px 0 #ad5fff inset, 0 60px 60px 0 #471eec inset; } }
-.loader-letter { display:inline-block; opacity:.6; transform: translateY(0); animation: loader-letter-anim 2s infinite; z-index:1; border-radius:50ch; border:none; padding: 0 2px; }
-.loader-letter:nth-child(1){animation-delay:0s} .loader-letter:nth-child(2){animation-delay:.1s} .loader-letter:nth-child(3){animation-delay:.2s} .loader-letter:nth-child(4){animation-delay:.3s} .loader-letter:nth-child(5){animation-delay:.4s} .loader-letter:nth-child(6){animation-delay:.5s} .loader-letter:nth-child(7){animation-delay:.6s} .loader-letter:nth-child(8){animation-delay:.7s} .loader-letter:nth-child(9){animation-delay:.8s} .loader-letter:nth-child(10){animation-delay:.9s}
-@keyframes loader-letter-anim { 0%,100%{ opacity:.5; transform: translateY(0);} 20%{opacity:1; transform: scale(1.15);} 40%{opacity:.7; transform: translateY(0);} }

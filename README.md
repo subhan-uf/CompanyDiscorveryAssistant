@@ -1,62 +1,50 @@
 Smart Company Discovery Assistant
 
 Overview
-- Multi-service app to manage internal Q&A and answer user questions using LLMs.
+- Multi‑service app for managing internal Q&A and answering questions using an LLM.
 - Components: Go web app (UI + API), Flask LLM service, PostgreSQL database.
 
-Requirements Recap
-- CRUD for Q&A entries with validation and delete confirmation
-- Ask page that calls /api/ask
-- Flask service uses embeddings to retrieve top‑3 relevant Q&A and generates an answer
-- Clear setup using environment variables
-
 Quick Start (Local)
-This project assumes you already have a valid `.env` file provided to you (DB + API keys). No additional configuration is required.
+This project assumes you already have a valid `.env` provided by the maintainer. No extra key or database setup is required.
 
-1) Install dependencies
-   - Go 1.22+
-   - Python 3.10+
+1) Install prerequisites
+- Go 1.22+
+- Python 3.10+
 
 2) Start the Flask LLM service
-   - cd flask_service && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-   - export $(grep -v '^#' ../.env | xargs)
-   - flask --app app.py run --host 0.0.0.0 --port 5000
+- cd flask_service
+- python3 -m venv .venv && source .venv/bin/activate
+- pip install -r requirements.txt
+- export $(grep -v '^#' ../.env | xargs)
+- flask --app app.py run --host 0.0.0.0 --port 5000
 
 3) Start the Go web app
-   - In a new terminal at repo root:
-     export $(grep -v '^#' .env | xargs) || true
-     go run ./cmd/server
-   - Open http://localhost:8080
+- In a new terminal at the repo root:
+  - export $(grep -v '^#' .env | xargs) || true
+  - go run ./cmd/server
+- Open http://localhost:8080
 
-4) Initialize schema and seed (optional)
-   - On first start, the Go server applies `migrations/001_init.sql` automatically.
-   - To seed sample Q&A: in Supabase SQL Editor, paste `scripts/seed.sql` and Run
+4) Optional: seed sample data
+- On first start, the Go server applies `migrations/001_init.sql` automatically.
+- To seed examples: use your DB console (e.g., Supabase SQL Editor), paste `scripts/seed.sql`, then Run.
 
 Usage
-- Navigate to Q&A to create/edit/delete entries. The list supports search, sorting, and pagination via controls at the top.
-- Open Ask to submit a question. The Go API calls the Flask service, which retrieves relevant Q&A and generates an answer.
+- Q&A Management: http://localhost:8080/qa (list, search, sort, pagination, create/edit/delete)
+- Ask: http://localhost:8080/ask (type a question and view the generated answer)
 
 Configuration
-- All required environment variables are provided via `.env`.
-- Common variables: `DATABASE_URL`, `FLASK_URL`, `PORT`, and LLM provider keys.
-
-Testing The Flow
-- Seed data via scripts/seed.sql
-- Start both services as described
-- Ask a question like: "What is the refund policy?" and verify the answer.
+- All required environment variables are read from the provided `.env`.
 
 Migrations
-- Startup applies `migrations/001_init.sql`. For further changes, add new sequential SQL files.
+- Startup applies `migrations/001_init.sql`. For further schema changes, add a new sequential SQL file in `migrations/`.
 
 Troubleshooting
-- Flask unavailable: ensure Flask is running and `FLASK_URL` (from `.env`) is correct.
+- Flask unavailable: ensure Flask is running and `FLASK_URL` from `.env` points to http://localhost:5000 (default).
 - DB connection: verify `DATABASE_URL` in `.env`.
 
 Documentation
-- See documentation/ for architecture, API contracts, schema, and env details.
-- Requirements compliance: documentation/requirements/compliance.md
- - Supabase setup (hosted Postgres): documentation/setup/supabase.md
+- See `documentation/` for architecture, endpoints, env, and requirements compliance.
 
 Docker (Optional)
 - docker compose up --build
-- Go app at http://localhost:8080, Flask at http://localhost:5000
+- Go app: http://localhost:8080, Flask: http://localhost:5000

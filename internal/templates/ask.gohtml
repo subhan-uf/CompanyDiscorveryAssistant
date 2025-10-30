@@ -6,49 +6,28 @@
     <input id="question" type="text" placeholder="Type your question..." />
     <button id="askBtn">Ask</button>
   </div>
-  <div class="card" id="answerCard" style="display:none; position: relative;">
+  <div class="card" id="answerCard" style="display:none;">
     <h3>Answer</h3>
-    <!-- Generating spinner overlay -->
-    <div id="genSpinner" class="gen-spinner" hidden>
-      <div class="loader-wrapper">
-        <span class="loader-letter">G</span>
-        <span class="loader-letter">e</span>
-        <span class="loader-letter">n</span>
-        <span class="loader-letter">e</span>
-        <span class="loader-letter">r</span>
-        <span class="loader-letter">a</span>
-        <span class="loader-letter">t</span>
-        <span class="loader-letter">i</span>
-        <span class="loader-letter">n</span>
-        <span class="loader-letter">g</span>
-        <div class="loader"></div>
-      </div>
-    </div>
     <pre id="answer"></pre>
   </div>
 </section>
 <script>
   const btn = document.getElementById('askBtn');
-  const answerCard = document.getElementById('answerCard');
-  const spinner = document.getElementById('genSpinner');
-  const answerEl = document.getElementById('answer');
   btn.addEventListener('click', async () => {
     const q = document.getElementById('question').value.trim();
     if (!q) { alert('Please enter a question.'); return; }
     btn.disabled = true; btn.textContent = 'Asking...';
-    answerCard.style.display = 'block';
-    spinner.hidden = false; answerEl.textContent = '';
     try {
       const res = await fetch('/api/ask', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({question: q})
       });
       const data = await res.json();
-      answerEl.textContent = data.answer || data.error || 'No answer';
+      document.getElementById('answer').textContent = data.answer || data.error || 'No answer';
+      document.getElementById('answerCard').style.display = 'block';
     } catch (e) {
-      answerEl.textContent = 'Failed to ask: ' + e;
+      alert('Failed to ask: ' + e);
     } finally {
-      spinner.hidden = true;
       btn.disabled = false; btn.textContent = 'Ask';
     }
   });
