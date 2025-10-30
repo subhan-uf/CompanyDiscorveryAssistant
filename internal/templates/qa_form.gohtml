@@ -1,17 +1,33 @@
 {{define "content_qa_form"}}
-<section>
-  {{if eq .Mode "create"}}<h2>New Q&A</h2>{{else}}<h2>Edit Q&A</h2>{{end}}
+<section class="page-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">Knowledge base</p>
+      {{if eq .Mode "create"}}
+        <h2>Create Q&amp;A</h2>
+        <p class="section-subtitle">Add a new trusted entry that will be used during retrieval.</p>
+      {{else}}
+        <h2>Edit Q&amp;A</h2>
+        <p class="section-subtitle">Update the content while keeping answers crisp and contextual.</p>
+      {{end}}
+    </div>
+    <a class="btn secondary" href="/qa">Back to list</a>
+  </header>
+
   {{if .Error}}
-    <div class="error">{{.Error}}</div>
+    <div class="card error-card">{{.Error}}</div>
   {{end}}
-  <form method="post" action="{{if eq .Mode "create"}}/qa/create{{else}}/qa/edit?id={{.ID}}{{end}}" class="form">
-    <label>Question</label>
-    <textarea name="question" rows="3" required>{{.Question}}</textarea>
-    <label>Answer</label>
-    <textarea name="answer" rows="5" required>{{.Answer}}</textarea>
-    <div class="actions">
-      <button type="submit">Save</button>
-      <a class="btn" href="/qa">Cancel</a>
+
+  <form method="post" action="{{if eq .Mode "create"}}/qa/create{{else}}/qa/edit?id={{.ID}}{{end}}" class="card form">
+    <label for="question">Question</label>
+    <textarea id="question" name="question" rows="3" required placeholder="What question should the assistant match?">{{.Question}}</textarea>
+
+    <label for="answer">Answer</label>
+    <textarea id="answer" name="answer" rows="6" required placeholder="Provide a concise, authoritative response.">{{.Answer}}</textarea>
+
+    <div class="form-actions">
+      <button type="submit" class="btn">{{if eq .Mode "create"}}Create entry{{else}}Save changes{{end}}</button>
+      <a class="btn tertiary" href="/qa">Cancel</a>
     </div>
   </form>
 </section>
