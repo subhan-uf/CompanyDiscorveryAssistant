@@ -1,35 +1,148 @@
 {{define "content_ask"}}
-<section>
-  <h2>Ask a Question</h2>
-  <div class="card">
-    <label for="question">Question</label>
-    <input id="question" type="text" placeholder="Type your question..." />
-    <button id="askBtn">Ask</button>
+<section class="chat-section">
+  <header class="chat-header">
+    <div>
+      <p class="eyebrow">Ask the assistant</p>
+      <h2>Conversation</h2>
+      <p class="chat-subtitle">The assistant uses your curated Q&amp;A pairs and retrieval scoring to craft an answer.</p>
+    </div>
+    <button type="button" id="clearChat" class="btn secondary subtle">Clear</button>
+  </header>
+
+  <div class="chat-window">
+    <div id="chatMessages" class="chat-messages" aria-live="polite">
+      <div class="chat-message assistant">
+        <div class="avatar" aria-hidden="true">AI</div>
+        <div class="bubble">
+          <p>Hi there! Ask me about your company discovery data and I&rsquo;ll reference the knowledge base for you.</p>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="card" id="answerCard" style="display:none;">
-    <h3>Answer</h3>
-    <pre id="answer"></pre>
-  </div>
+
+  <form id="chatForm" class="chat-input" autocomplete="off">
+    <label class="visually-hidden" for="questionInput">Your question</label>
+    <textarea id="questionInput" rows="2" placeholder="Send a message..." spellcheck="true"></textarea>
+    <div class="chat-actions">
+      <span id="chatStatus" class="chat-status" role="status"></span>
+      <div class="chat-buttons">
+        <button type="submit" id="sendBtn" class="btn">Send</button>
+      </div>
+    </div>
+  </form>
 </section>
 <script>
-  const btn = document.getElementById('askBtn');
-  btn.addEventListener('click', async () => {
-    const q = document.getElementById('question').value.trim();
-    if (!q) { alert('Please enter a question.'); return; }
-    btn.disabled = true; btn.textContent = 'Asking...';
+(() => {
+  const chatMessages = document.getElementById('chatMessages');
+  const chatForm = document.getElementById('chatForm');
+  const input = document.getElementById('questionInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const statusEl = document.getElementById('chatStatus');
+  const clearBtn = document.getElementById('clearChat');
+
+  const messages = [];
+
+  const createMessageEl = (role, content, options = {}) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = `chat-message ${role}` + (options.thinking ? ' thinking' : '');
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.textContent = role === 'user' ? 'You' : 'AI';
+    wrapper.appendChild(avatar);
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerText = content;
+    wrapper.appendChild(bubble);
+
+    chatMessages.appendChild(wrapper);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return { wrapper, bubble };
+  };
+
+  const setStatus = (text) => {
+    statusEl.textContent = text || '';
+  };
+
+  const sendQuestion = async (question) => {
+    setStatus('Thinking...');
+    sendBtn.disabled = true;
+    input.disabled = true;
+
+    const placeholder = createMessageEl('assistant', 'Thinking...', { thinking: true });
+
     try {
       const res = await fetch('/api/ask', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({question: q})
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
       });
-      const data = await res.json();
-      document.getElementById('answer').textContent = data.answer || data.error || 'No answer';
-      document.getElementById('answerCard').style.display = 'block';
-    } catch (e) {
-      alert('Failed to ask: ' + e);
+      const text = await res.text();
+      let data = {};
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = { raw: text };
+        }
+      }
+      if (!res.ok) {
+        const message = data.error || data.message || data.raw || `Assistant returned status ${res.status}`;
+        throw new Error(message);
+      }
+      const answer = data.answer || data.raw || 'No answer was returned.';
+
+      placeholder.wrapper.classList.remove('thinking');
+      placeholder.bubble.textContent = answer;
+
+      messages.push({ role: 'assistant', content: answer });
+      setStatus('');
+    } catch (err) {
+      const message = err instanceof Error && err.message ? err.message : 'Sorry, something went wrong. Please try again.';
+      placeholder.wrapper.classList.remove('thinking');
+      placeholder.bubble.textContent = message;
+      setStatus(message);
+      console.error(err);
     } finally {
-      btn.disabled = false; btn.textContent = 'Ask';
+      sendBtn.disabled = false;
+      input.disabled = false;
+      input.focus();
+    }
+  };
+
+  chatForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const question = input.value.trim();
+    if (!question) {
+      setStatus('Please enter a question.');
+      return;
+    }
+
+    messages.push({ role: 'user', content: question });
+    createMessageEl('user', question);
+    input.value = '';
+    sendQuestion(question);
+  });
+
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: false }));
     }
   });
+
+  clearBtn.addEventListener('click', () => {
+    const initialMessage = chatMessages.firstElementChild?.cloneNode(true);
+    chatMessages.innerHTML = '';
+    if (initialMessage) {
+      chatMessages.appendChild(initialMessage);
+    }
+    messages.length = 0;
+    input.value = '';
+    setStatus('');
+    input.focus();
+  });
+})();
 </script>
 {{end}}
