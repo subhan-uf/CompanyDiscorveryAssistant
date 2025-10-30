@@ -1,6 +1,25 @@
 {{define "content_home"}}
-<section>
-  <h2>Welcome</h2>
-  <p>Use the navigation to manage Q&A or ask a question.</p>
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Internal Copilot</p>
+    <h2>Search, synthesize, and answer questions in seconds.</h2>
+    <p class="hero-subtitle">
+      Curate a trusted knowledge base, then ask natural language questions to surface the most relevant context instantly.
+    </p>
+    <div class="hero-actions">
+      <a class="btn" href="/ask">Start a conversation</a>
+      <a class="btn secondary" href="/qa">Manage Q&amp;A</a>
+    </div>
+  </div>
+  <div class="hero-preview">
+    <div class="hero-card">
+      <span class="hero-label">Recent highlights</span>
+      <ul>
+        <li><strong>Retrieval-aware responses</strong> summarize answers instead of copying.</li>
+        <li><strong>Embeddings ranking</strong> blends semantic + keyword matching.</li>
+        <li><strong>Friendly UI</strong> keeps each conversation visible and shareable.</li>
+      </ul>
+    </div>
+  </div>
 </section>
 {{end}}

@@ -7,33 +7,50 @@
   <title>Smart Company Discovery Assistant</title>
   <link rel="stylesheet" href="/static/css/style.css" />
 </head>
-<body>
-  <header class="nav">
-    <div class="container">
-      <h1>Smart Company Discovery Assistant</h1>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/ask">Ask</a>
-        <a href="/qa">Q&A</a>
-      </nav>
-    </div>
-  </header>
-  <main class="container">
-    {{/* Render content based on explicit template name */}}
-    {{ if eq .ContentTemplate "content_home" }}
-      {{ template "content_home" . }}
-    {{ else if eq .ContentTemplate "content_ask" }}
-      {{ template "content_ask" . }}
-    {{ else if eq .ContentTemplate "content_qa_list" }}
-      {{ template "content_qa_list" . }}
-    {{ else if eq .ContentTemplate "content_qa_form" }}
-      {{ template "content_qa_form" . }}
-    {{ else if eq .ContentTemplate "content_qa_delete" }}
-      {{ template "content_qa_delete" . }}
-    {{ else }}
-      {{ template "content_home" . }}
-    {{ end }}
-  </main>
+<body class="app-body">
+  <div class="app-shell">
+    <header class="nav">
+      <div class="container nav-inner">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <h1>Smart Company Discovery Assistant</h1>
+            <p class="tagline">Research, curate, and respond faster with an internal copilot.</p>
+          </div>
+        </div>
+        <nav class="nav-links">
+          <a href="/" {{if eq .ContentTemplate "content_home"}}class="active"{{end}}>Home</a>
+          <a href="/ask" {{if eq .ContentTemplate "content_ask"}}class="active"{{end}}>Ask</a>
+          <a href="/qa" {{if or (eq .ContentTemplate "content_qa_list") (eq .ContentTemplate "content_qa_form") (eq .ContentTemplate "content_qa_delete") }}class="active"{{end}}>Q&amp;A</a>
+        </nav>
+      </div>
+    </header>
+    <main class="container page">
+      {{/* Render content based on explicit template name */}}
+      {{ if eq .ContentTemplate "content_home" }}
+        {{ template "content_home" . }}
+      {{ else if eq .ContentTemplate "content_ask" }}
+        {{ template "content_ask" . }}
+      {{ else if eq .ContentTemplate "content_qa_list" }}
+        {{ template "content_qa_list" . }}
+      {{ else if eq .ContentTemplate "content_qa_form" }}
+        {{ template "content_qa_form" . }}
+      {{ else if eq .ContentTemplate "content_qa_delete" }}
+        {{ template "content_qa_delete" . }}
+      {{ else }}
+        {{ template "content_home" . }}
+      {{ end }}
+    </main>
+    <footer class="app-footer">
+      <div class="container footer-inner">
+        <span>&copy; {{.Year | defaultYear}} Smart Company Discovery Assistant</span>
+        <span class="footer-links">
+          <a href="/ask">Ask</a>
+          <a href="/qa">Manage Knowledge</a>
+        </span>
+      </div>
+    </footer>
+  </div>
 </body>
 </html>
 {{end}}
