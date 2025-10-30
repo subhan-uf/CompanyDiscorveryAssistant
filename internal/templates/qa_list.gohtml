@@ -1,0 +1,54 @@
+{{define "content_qa_list"}}
+<section>
+  <h2>Q&A Management</h2>
+  <div class="toolbar">
+    <form method="get" action="/qa" style="display:flex; gap:8px; align-items:center;">
+      <input type="text" name="search" placeholder="Search..." value="{{.Params.Search}}" />
+      <select name="sort">
+        <option value="id_desc" {{if eq .Params.Sort "id_desc"}}selected{{end}}>Newest</option>
+        <option value="id_asc" {{if eq .Params.Sort "id_asc"}}selected{{end}}>Oldest</option>
+        <option value="question_asc" {{if eq .Params.Sort "question_asc"}}selected{{end}}>Question A→Z</option>
+        <option value="question_desc" {{if eq .Params.Sort "question_desc"}}selected{{end}}>Question Z→A</option>
+      </select>
+      <input type="number" name="page_size" min="1" max="100" value="{{.Params.PageSize}}" placeholder="Page size" />
+      <button type="submit">Apply</button>
+      <a class="btn" href="/qa/create">+ New</a>
+    </form>
+  </div>
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Question</th><th>Answer</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {{range .Items}}
+      <tr>
+        <td>{{.ID}}</td>
+        <td>{{.Question}}</td>
+        <td>{{.Answer}}</td>
+        <td>
+          <a href="/qa/edit?id={{.ID}}">Edit</a>
+          <a href="/qa/delete?id={{.ID}}">Delete</a>
+        </td>
+      </tr>
+      {{else}}
+      <tr><td colspan="4">No records found.</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+  <div class="pagination">
+    {{ $page := .Params.Page }}
+    {{ $size := .Params.PageSize }}
+    {{ $total := .Total }}
+    {{ $prev := sub $page 1 }}
+    {{ $next := add $page 1 }}
+    {{ $maxPage := max 1 (divCeil $total $size) }}
+    <div>
+      Page {{$page}} of {{$maxPage}} ({{$total}} items)
+    </div>
+    <div>
+      {{if gt $page 1}}<a href="/qa?page={{$prev}}&page_size={{$size}}&sort={{.Params.Sort}}&search={{.Params.Search}}">Prev</a>{{end}}
+      {{if lt $page $maxPage}}<a href="/qa?page={{$next}}&page_size={{$size}}&sort={{.Params.Sort}}&search={{.Params.Search}}">Next</a>{{end}}
+    </div>
+  </div>
+</section>
+{{end}}

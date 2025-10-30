@@ -1,0 +1,18 @@
+{{define "content_qa_form"}}
+<section>
+  {{if eq .Mode "create"}}<h2>New Q&A</h2>{{else}}<h2>Edit Q&A</h2>{{end}}
+  {{if .Error}}
+    <div class="error">{{.Error}}</div>
+  {{end}}
+  <form method="post" action="{{if eq .Mode "create"}}/qa/create{{else}}/qa/edit?id={{.ID}}{{end}}" class="form">
+    <label>Question</label>
+    <textarea name="question" rows="3" required>{{.Question}}</textarea>
+    <label>Answer</label>
+    <textarea name="answer" rows="5" required>{{.Answer}}</textarea>
+    <div class="actions">
+      <button type="submit">Save</button>
+      <a class="btn" href="/qa">Cancel</a>
+    </div>
+  </form>
+</section>
+{{end}}

@@ -1,0 +1,39 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Company Discovery Assistant</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="container">
+      <h1>Smart Company Discovery Assistant</h1>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/ask">Ask</a>
+        <a href="/qa">Q&A</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    {{/* Render content based on explicit template name */}}
+    {{ if eq .ContentTemplate "content_home" }}
+      {{ template "content_home" . }}
+    {{ else if eq .ContentTemplate "content_ask" }}
+      {{ template "content_ask" . }}
+    {{ else if eq .ContentTemplate "content_qa_list" }}
+      {{ template "content_qa_list" . }}
+    {{ else if eq .ContentTemplate "content_qa_form" }}
+      {{ template "content_qa_form" . }}
+    {{ else if eq .ContentTemplate "content_qa_delete" }}
+      {{ template "content_qa_delete" . }}
+    {{ else }}
+      {{ template "content_home" . }}
+    {{ end }}
+  </main>
+</body>
+</html>
+{{end}}

@@ -1,0 +1,23 @@
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+flask_service/.venv/
+
+# Node
+node_modules/
+
+# Go
+bin/
+dist/
+
+# Local env and docs (keep docs local for now)
+.env
+documentation/
+
+# Misc
+*.log
