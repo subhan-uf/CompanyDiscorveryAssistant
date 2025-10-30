@@ -14,45 +14,30 @@ Quick Start (Local)
 1) Install dependencies
    - Go 1.22+
    - Python 3.10+
-   - PostgreSQL 14+
-   - Option A (Local, no API): Ollama (free) — https://ollama.com/download
-   - Option B (Hosted, free tiers): Groq and/or Together (no local models)
+   - PostgreSQL 14+ (local optional; we use Supabase hosted Postgres in these steps)
 
-2) Create and configure a database
-   - Create a database named `smartassistant` (or adjust env):
-     createdb smartassistant
+2) Configure database (Supabase hosted)
    - Copy env example:
      cp .env.example .env
-   - Ensure `DATABASE_URL` points to your DB.
+   - Set `DATABASE_URL` to your Supabase Postgres URI with sslmode=require
+     e.g., postgres://postgres:<password>@db.<project-ref>.supabase.co:5432/postgres?sslmode=require
 
 3) Initialize schema and seed (optional)
    - The Go server applies `migrations/001_init.sql` automatically at startup.
-   - To seed sample Q&A:
-     psql "$DATABASE_URL" -f scripts/seed.sql
+   - To seed sample Q&A in Supabase: open SQL Editor → paste `scripts/seed.sql` → Run
 
 4) Start the Flask LLM service
    - Create a virtual environment and install deps:
      cd flask_service && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-   - Choose ONE of:
-     A) Free local models with Ollama (no OpenAI key required):
-      - Install Ollama and start it (see download link above)
-      - Pull models:
-        ollama pull nomic-embed-text
-        ollama pull llama3.1:8b
-      - Optional: set explicit env (defaults will work):
-        export OLLAMA_BASE_URL=http://localhost:11434
-        export OLLAMA_EMBED_MODEL=nomic-embed-text
-        export OLLAMA_CHAT_MODEL=llama3.1:8b
-     B) Hosted (no local models):
-       - Sign up and get a free API key from one of:
-         Groq: https://console.groq.com/keys (models: llama-3.1-8b-instant, etc.)
-         Together: https://api.together.xyz (models: Meta-Llama-3.1-8B-Instruct-Turbo, embeddings m2-bert)
-       - Export one or more keys:
-         export GROQ_API_KEY=grq_...
-         export TOGETHER_API_KEY=...
-       - Optional embeddings provider:
-          Cohere: https://dashboard.cohere.com/api-keys (model: embed-english-v3.0)
-          export COHERE_API_KEY=...
+   - Hosted providers (no local models):
+     - Sign up and get free API keys:
+       Groq (chat): https://console.groq.com/keys
+       Together (chat/embeddings): https://api.together.xyz
+       Cohere (embeddings): https://dashboard.cohere.com/api-keys
+     - Export keys (any combination works):
+       export GROQ_API_KEY=grq_...
+       export TOGETHER_API_KEY=...
+       export COHERE_API_KEY=...
    - Run Flask:
      export DATABASE_URL=${DATABASE_URL}
      flask --app app.py run --host 0.0.0.0 --port 5000
@@ -71,9 +56,6 @@ Configuration
 - DATABASE_URL: PostgreSQL connection (e.g., postgres://user:pass@localhost:5432/smartassistant?sslmode=disable)
 - FLASK_URL: Flask service base URL (default http://localhost:5000)
 - PORT: Go server port (default 8080)
-- OLLAMA_BASE_URL (Flask): URL to Ollama (default http://localhost:11434)
-- OLLAMA_EMBED_MODEL (Flask): Embedding model (default nomic-embed-text)
-- OLLAMA_CHAT_MODEL (Flask): Chat model (default llama3.1:8b)
 - GROQ_API_KEY (Flask optional): Hosted Llama chat via Groq
 - TOGETHER_API_KEY (Flask optional): Hosted Llama chat and embeddings via Together
 - COHERE_API_KEY (Flask optional): Hosted embeddings via Cohere

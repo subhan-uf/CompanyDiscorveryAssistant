@@ -23,12 +23,6 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 
-# Ollama config (free local models)
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_EMBED_MODEL = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
-OLLAMA_CHAT_MODEL = os.getenv("OLLAMA_CHAT_MODEL", "llama3.1:8b")
-OLLAMA_ENABLED = os.getenv("OLLAMA_ENABLED", "true").lower() in ("1", "true", "yes", "on")
-
 _conn = None
 _openai_client = None
 
@@ -46,15 +40,6 @@ def get_openai():
         _openai_client = OpenAI(api_key=OPENAI_API_KEY)
     return _openai_client
 
-
-def ollama_available() -> bool:
-    if not OLLAMA_ENABLED:
-        return False
-    try:
-        r = requests.get(f"{OLLAMA_BASE_URL}/api/tags", timeout=1.5)
-        return r.status_code == 200
-    except Exception:
-        return False
 
 
 def fetch_qas() -> List[Tuple[int, str, str]]:
@@ -75,16 +60,6 @@ def cosine_sim(a: List[float], b: List[float]) -> float:
         return 0.0
     return dot / (na * nb)
 
-
-def embed_ollama(texts: List[str]) -> List[List[float]]:
-    embs: List[List[float]] = []
-    for t in texts:
-        payload = {"model": OLLAMA_EMBED_MODEL, "prompt": t}
-        r = requests.post(f"{OLLAMA_BASE_URL}/api/embeddings", json=payload, timeout=30)
-        r.raise_for_status()
-        data = r.json()
-        embs.append(data.get("embedding") or data.get("embeddings") or [])
-    return embs
 
 
 def embed_openai(texts: List[str]) -> List[List[float]]:
@@ -123,12 +98,10 @@ def embed_together(texts: List[str]) -> List[List[float]]:
 
 
 def top3_by_embedding(question: str, qas: List[Tuple[int, str, str]]):
-    # Prefer Ollama embeddings; else Cohere/Together/OpenAI; else overlap fallback
+    # Prefer Cohere → Together → OpenAI; else overlap fallback
     try:
         q_texts = [f"{q}\n{a}" for (_, q, a) in qas]
-        if ollama_available():
-            embs = embed_ollama([question] + q_texts)
-        elif COHERE_API_KEY:
+        if COHERE_API_KEY:
             embs = embed_cohere([question] + q_texts)
         elif TOGETHER_API_KEY:
             embs = embed_together([question] + q_texts)
@@ -154,31 +127,6 @@ def top3_by_embedding(question: str, qas: List[Tuple[int, str, str]]):
         scored.sort(key=lambda x: x[0], reverse=True)
         return [item for (_, item) in scored[:3]]
 
-
-def generate_answer_ollama(question: str, context_text: str) -> str:
-    messages = [
-        {
-            "role": "system",
-            "content": (
-                "You are a concise, professional internal assistant. \n"
-                "Answer strictly using the provided Q&A context. If unknown, say you do not know. \n"
-                "Paraphrase the answer; do not copy wording verbatim. \n"
-                "Keep it short: 1–3 sentences, clear and neutral."
-            ),
-        },
-        {"role": "user", "content": f"Context:\n{context_text}\n\nUser question: {question}"},
-    ]
-    payload = {"model": OLLAMA_CHAT_MODEL, "messages": messages, "stream": False}
-    r = requests.post(f"{OLLAMA_BASE_URL}/api/chat", json=payload, timeout=120)
-    r.raise_for_status()
-    data = r.json()
-    # Both /api/chat and /api/generate exist; for chat, expect 'message' with 'content'
-    if isinstance(data, dict):
-        msg = data.get("message") or {}
-        content = (msg.get("content") if isinstance(msg, dict) else None) or data.get("response")
-        if content:
-            return str(content)
-    return ""
 
 
 def generate_answer_openai(question: str, context_text: str) -> str:
@@ -254,14 +202,7 @@ def generate_answer_together(question: str, context_text: str) -> str:
 
 def generate_answer(question: str, context_qas: List[Tuple[int, str, str]]) -> str:
     context_text = "\n\n".join([f"Q: {q}\nA: {a}" for (_, q, a) in context_qas])
-    # Prefer Ollama chat; else Groq/Together/OpenAI; else fallback to best matching answer
-    try:
-        if ollama_available():
-            out = generate_answer_ollama(question, context_text)
-            if out:
-                return out
-    except Exception:
-        pass
+    # Prefer Groq → Together → OpenAI; else fallback to best matching answer
     try:
         out = generate_answer_groq(question, context_text)
         if out:

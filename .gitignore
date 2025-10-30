@@ -15,9 +15,8 @@ node_modules/
 bin/
 dist/
 
-# Local env and docs (keep docs local for now)
+# Local env
 .env
-documentation/
 
 # Misc
 *.log
