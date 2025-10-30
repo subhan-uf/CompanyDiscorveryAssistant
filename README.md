@@ -11,20 +11,35 @@ This project assumes you already have a valid `.env` provided by the maintainer.
 - Go 1.22+
 - Python 3.10+
 
-2) Start the Flask LLM service
-- cd flask_service
-- python3 -m venv .venv && source .venv/bin/activate
-- pip install -r requirements.txt
-- export $(grep -v '^#' ../.env | xargs)
-- flask --app app.py run --host 0.0.0.0 --port 5000
+2) Start services (choose your OS)
 
-3) Start the Go web app
-- In a new terminal at the repo root:
-  - export $(grep -v '^#' .env | xargs) || true
-  - go run ./cmd/server
-- Open http://localhost:8080
+Linux / macOS
+- Flask service
+  - `cd flask_service`
+  - `python3 -m venv .venv && source .venv/bin/activate`
+  - `pip install -r requirements.txt`
+  - `export $(grep -v '^#' ../.env | xargs)`
+  - `flask --app app.py run --host 0.0.0.0 --port 5000`
+- Go web app (new terminal at repo root)
+  - `export $(grep -v '^#' .env | xargs) || true`
+  - `go run ./cmd/server`
+  - Open http://localhost:8080
 
-4) Optional: seed sample data
+Windows (PowerShell)
+- Flask service
+  - `cd flask_service`
+  - `py -3 -m venv .venv`
+  - `.\.venv\Scripts\Activate.ps1`
+  - `pip install -r requirements.txt`
+  - Load .env into the current session:
+    - `Get-Content ..\.env | Where-Object { $_ -and $_ -notmatch '^\s*#' } | ForEach-Object { $p = $_ -split '=',2; if ($p.Length -eq 2) { Set-Item -Path Env:$($p[0]) -Value $p[1] } }`
+  - `flask --app app.py run --host 0.0.0.0 --port 5000`
+- Go web app (new PowerShell at repo root)
+  - `Get-Content .\.env | Where-Object { $_ -and $_ -notmatch '^\s*#' } | ForEach-Object { $p = $_ -split '=',2; if ($p.Length -eq 2) { Set-Item -Path Env:$($p[0]) -Value $p[1] } }`
+  - `go run .\cmd\server`
+  - Open http://localhost:8080
+
+3) Optional: seed sample data
 - On first start, the Go server applies `migrations/001_init.sql` automatically.
 - To seed examples: use your DB console (e.g., Supabase SQL Editor), paste `scripts/seed.sql`, then Run.
 
